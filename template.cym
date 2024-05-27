@@ -1,0 +1,111 @@
+% Two asters and a nucleus
+
+
+
+
+
+% The simulation configuration
+set simul system
+{
+    time_step = 0.06
+    viscosity = 1
+    verbose = 0
+    steric = 1, 100
+    kT = 0.0042
+    steric_max_range = 0.1
+    display = (color = light_gray;)
+}
+
+% The cell ; now a cylinder along the vertical (Z) axis
+set space cell
+{
+    shape = cylinderZ
+    display = ( color=0x44444444, dark_gray; visible=3 )
+}
+
+new cell
+{
+    radius = 4
+    bottom = -20
+    top = 20
+}
+
+% Definiting microtubule proprteies
+set fiber microtubule
+{
+    % They are stiff
+    rigidity = 30
+    confine = inside, 200
+    segmentation = 1
+    steric = 1, 0.05  % enable, radius
+    % They have a dynamical instability
+    activity = classic
+    growing_speed     = 0.5,  0
+    shrinking_speed   = -0.5316194421233533, 0
+    catastrophe_rate  = 0.00014890275303706125, 0.0
+    % When stalled, they undergo more catastrophe
+    catastrophe_rate_stalled = 4.0, 0
+    rescue_rate       = 0.34179675465975734,    0
+    growing_force     = 0.4283064525442795,  3.5
+    % They do not fully disappear if depolymrized
+    persistent     = 1
+    min_length     = 0.6
+    display = ( line_width=3; color=green; )
+    total_polymer = 500
+}
+
+% The centrosomes
+set solid core
+{
+    % core is the solid at the center of centrosomes
+    display = ( style=3; color=red; )
+    viscosity = 10000000
+}
+
+% A centrosome is a solid holding MT with a given stiffness
+set aster centrosome
+{
+    stiffness = 1000, 500
+}
+
+new centrosome
+{
+    solid = core
+    position = 0 -1.25 0
+    radius = 0.5
+    point1 = center, 0.5
+    fibers = 200, microtubule, ( length = 0.6; end_state = 1,4 )
+}
+
+new centrosome
+{
+    solid = core
+    position = 0 1.25 0
+    radius = 0.5
+    point1 = center, 0.5
+    fibers = 200, microtubule, ( length = 0.6; end_state=1,4 )
+}
+
+% The nucleus
+set bead kern
+{   
+    viscosity  = 1000000000
+    confine = inside, 1000
+    steric = 1
+    display = ( style=7; color=blue; )
+}
+
+new 1 kern
+{
+    radius = 3
+    position = 0 0 3.5
+}
+
+% Running the simulation
+run system
+{
+    % Number of time steps (duration : nb_steps * time_step )
+    nb_steps = 10000
+    % Number of saved frames
+    nb_frames = 200
+}
